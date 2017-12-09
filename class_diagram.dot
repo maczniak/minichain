@@ -1,0 +1,113 @@
+digraph minichain {
+    rankdir=LR;
+
+    block [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray">&lt;Block&gt;</TD></TR>
+  <TR><TD ALIGN="left" PORT="header">header</TD></TR>
+  <TR><TD ALIGN="left" PORT="txs">txs</TD></TR>
+</TABLE>>];
+
+    blockheader [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;BlockHeader&gt;</TD></TR>
+  <TR><TD ALIGN="left">prevHash &lt;Buffer&gt;</TD></TR>
+  <TR><TD ALIGN="left">merkleRoot &lt;Buffer&gt;</TD></TR>
+  <TR><TD ALIGN="left">timestamp &lt;Date&gt;</TD></TR>
+  <TR><TD ALIGN="left">nonce &lt;number&gt;</TD></TR>
+</TABLE>>];
+
+    txs [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;Tx[]&gt;</TD></TR>
+  <TR><TD PORT="coinbasetx"> </TD></TR>
+  <TR><TD PORT="normaltx"> </TD></TR>
+  <TR><TD>...</TD></TR>
+</TABLE>>];
+
+    normaltx [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;NormalTx&gt;</TD></TR>
+  <TR><TD ALIGN="left" PORT="inputs">_inputs</TD></TR>
+  <TR><TD ALIGN="left" PORT="outputs">_outputs</TD></TR>
+</TABLE>>];
+
+    inputs [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;TxInput[]&gt;</TD></TR>
+  <TR><TD PORT="txinput"> </TD></TR>
+  <TR><TD> </TD></TR>
+  <TR><TD>...</TD></TR>
+</TABLE>>];
+
+    txinput [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;TxInput&gt;</TD></TR>
+  <TR><TD ALIGN="left" PORT="prevout">prevOut</TD></TR>
+  <TR><TD ALIGN="left" PORT="scriptsig">scriptSig</TD></TR>
+</TABLE>>];
+
+    outpoint [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;OutPoint&gt;</TD></TR>
+  <TR><TD ALIGN="left">hash &lt;TxHash=Buffer&gt;</TD></TR>
+  <TR><TD ALIGN="left">index &lt;number&gt;</TD></TR>
+</TABLE>>];
+
+    scriptsig [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;ScriptSig&gt;</TD></TR>
+  <TR><TD ALIGN="left">sig &lt;Buffer&gt;</TD></TR>
+  <TR><TD ALIGN="left">pubKey &lt;Buffer&gt;</TD></TR>
+</TABLE>>];
+
+    outputs [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;TxOutput[]&gt;</TD></TR>
+  <TR><TD PORT="txoutput">index 0</TD></TR>
+  <TR><TD>index 1</TD></TR>
+  <TR><TD>...</TD></TR>
+</TABLE>>];
+
+    txoutput [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;TxOutput&gt;</TD></TR>
+  <TR><TD ALIGN="left">value &lt;number&gt;</TD></TR>
+  <TR><TD ALIGN="left">txOutScript &lt;Script=Op[]&gt;</TD></TR>
+</TABLE>>];
+
+    coinbasetx [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;CoinbaseTx&gt;</TD></TR>
+  <TR><TD ALIGN="left" PORT="outputs">_outputs</TD></TR>
+</TABLE>>];
+
+    coin [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" PORT="top">&lt;Coin&gt;</TD></TR>
+  <TR><TD ALIGN="left" PORT="outin">outIn</TD></TR>
+  <TR><TD ALIGN="left">coinBase &lt;boolean&gt;</TD></TR>
+  <TR><TD ALIGN="left">spent &lt;boolean&gt;</TD></TR>
+</TABLE>>];
+
+    coinsview [shape=none, label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD BGCOLOR="lightgray" COLSPAN="5">&lt;CoinsView&gt;</TD></TR>
+  <TR><TD ALIGN="left">map &lt;</TD><TD PORT="key">string (OutPoint)</TD><TD>→</TD><TD PORT="value">Coin</TD><TD>&gt;</TD></TR>
+</TABLE>>];
+
+    block:header -> blockheader:top;
+    block:txs -> txs:top;
+    txs:normaltx -> normaltx:top;
+    normaltx:inputs -> inputs:top;
+    inputs:txinput -> txinput:top;
+    txinput:prevout -> outpoint:top;
+    txinput:scriptsig -> scriptsig:top;
+    normaltx:outputs -> outputs:top;
+    outputs:txoutput -> txoutput:top;
+    txs:coinbasetx -> coinbasetx:top;
+    coinbasetx:outputs -> outputs:top;
+    coin:outin -> txoutput:top;
+    coinsview:key -> outpoint:top;
+    coinsview:value -> coin:top;
+}
