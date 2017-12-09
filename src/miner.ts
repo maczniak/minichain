@@ -15,7 +15,7 @@ export function createNewBlock(txOutScript: Script, txs: Tx[] = [], prevHash = B
     txs = [reward].concat(txs);
 
     const header: BlockHeader = {
-        nounce: 0,
+        nonce: 0,
         prevHash,
         merkleRoot: blockMerkleRoot(txs),
         timestamp: new Date()
@@ -23,8 +23,8 @@ export function createNewBlock(txOutScript: Script, txs: Tx[] = [], prevHash = B
 
     let hash: Buffer;
     do {
+        header.nonce++;
         hash = blockHash(header);
-        header.nounce++;
     } while (!isValidBlockHash(hash));
 
     console.log(`Mined block ${bufferToHex(hash)}`);

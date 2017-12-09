@@ -5,7 +5,7 @@ export interface BlockHeader {
     prevHash: Buffer;
     merkleRoot: Buffer;
     timestamp: Date;
-    nounce: number;
+    nonce: number;
 }
 
 export interface Block {
