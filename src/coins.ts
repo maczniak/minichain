@@ -72,7 +72,17 @@ export class CoinsView {
      * Returns the amount of coins coming in to a transaction.
      */
     public valueIn(_tx: Tx): number {
-        throw new Error("Not implemented");
+        let sum = 0;
+        if (isNormalTx(_tx)) {
+            for (const txin of _tx.inputs) {
+                if (this.hasCoin(txin.prevOut)) {
+                    sum += this.getCoin(txin.prevOut).out.value;
+                } else {
+                    return -1;
+                }
+            }
+        }
+        return sum;
     }
 
     /**
