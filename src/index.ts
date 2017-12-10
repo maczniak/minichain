@@ -39,7 +39,7 @@ function main() {
     const view = new CoinsView();
 
     const script1 = payToPubKeyHash(pubKey1);
-    const genesisBlock = createNewBlock(script1);
+    const genesisBlock = createNewBlock(script1, undefined, undefined, view);
     connectBlock(genesisBlock, view);
 
     const prevTx = genesisBlock.txs[0];
@@ -50,7 +50,7 @@ function main() {
 
     const script2 = payToPubKeyHash(pubKey2);
     const prevHash = blockHash(genesisBlock.header);
-    const block1 = createNewBlock(script2, [tx1, tx2, tx3], prevHash);
+    const block1 = createNewBlock(script2, [tx1, tx2, tx3], prevHash, view);
     const res = connectBlock(block1, view);
     console.log(res);
 }

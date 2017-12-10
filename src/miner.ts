@@ -1,15 +1,26 @@
 import { Block, BlockHeader, blockHash } from "./block";
 import { bufferToHex } from "./buffer";
 import { blockMerkleRoot } from "./merkle";
-import { CoinbaseTx, Tx } from "./tx";
+import { CoinbaseTx, Tx, isNormalTx } from "./tx";
 import { Script } from "./types";
+import { CoinsView } from "./coins";
 
 const BLOCK_REWARD = 50;
 
-export function createNewBlock(txOutScript: Script, txs: Tx[] = [], prevHash = Buffer.alloc(0)): Block {
+export function createNewBlock(txOutScript: Script, txs: Tx[] = [], prevHash = Buffer.alloc(0), view: CoinsView): Block {
     // FIXME: Add the mining fee to the coinbase transaction.
+    let valueInTotal = 0;
+    let valueOutTotal = 0;
+    for (const tx of txs) {
+        if (isNormalTx(tx)) {
+            for (const txinput of tx.inputs) {
+                valueInTotal += view.getCoin(txinput.prevOut).out.value;
+            }
+            valueOutTotal += tx.valueOut;
+        }
+    }
     const reward = new CoinbaseTx([{
-        value: BLOCK_REWARD,
+        value: BLOCK_REWARD + (valueInTotal - valueOutTotal),
         txOutScript
     }]);
     txs = [reward].concat(txs);
