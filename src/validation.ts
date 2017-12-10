@@ -77,6 +77,15 @@ export function checkTx(tx: Tx): boolean {
     }
 
     // FIXME: Check for duplicate inputs.
+    if (isNormalTx(tx)) {
+        let prevOutSet = new Set();
+        for (const txinput of tx.inputs.slice(1)) {
+            if (prevOutSet.has(txinput.prevOut)) {
+                return false;
+            }
+            prevOutSet.add(txinput.prevOut);
+        }
+    }
 
     return true;
 }
