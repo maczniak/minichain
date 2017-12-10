@@ -8,23 +8,26 @@ import { EMPTY_SCRIPT_SIG, OutPoint } from "./types";
 import { connectBlock } from "./validation";
 
 // FIXME: Support multiple inputs and outputs.
-function sendTx(fromPrivKey: Buffer, toPubKey: Buffer, value: number, prevOut: OutPoint): Tx {
-    const outputs = [{
-        value,
-        txOutScript: payToPubKeyHash(toPubKey)
-    }];
-    const sig = new NormalTx([{
+function sendTx(fromPrivKey: Buffer, toPubKeys: Buffer[], values: number[], prevOuts: OutPoint[]): Tx {
+    let outputs = [];
+    for (let i = 0; i < Math.min(toPubKeys.length, values.length); i++) {
+        outputs.push({
+            value: values[i],
+            txOutScript: payToPubKeyHash(toPubKeys[i])
+        });
+    }
+    const sig = new NormalTx(prevOuts.map((prevOut) => ({
         prevOut,
         scriptSig: EMPTY_SCRIPT_SIG
-    }], outputs).sig(fromPrivKey);
+    })), outputs).sig(fromPrivKey);
 
-    const inputs = [{
+    const inputs = prevOuts.map((prevOut) => ({
         prevOut,
         scriptSig: {
             sig,
             pubKey: getPubKey(fromPrivKey)
         }
-    }];
+    }));
     return new NormalTx(inputs, outputs);
 }
 
@@ -44,9 +47,9 @@ function main() {
 
     const prevTx = genesisBlock.txs[0];
 
-    const tx1 = sendTx(privKey1, pubKey2, 50, { hash: prevTx.hash, index: 0 });
-    const tx2 = sendTx(privKey2, pubKey3, 49, { hash: tx1.hash, index: 0 });
-    const tx3 = sendTx(privKey3, pubKey1, 48, { hash: tx2.hash, index: 0 });
+    const tx1 = sendTx(privKey1, [pubKey2], [50], [{ hash: prevTx.hash, index: 0 }]);
+    const tx2 = sendTx(privKey2, [pubKey3], [49], [{ hash: tx1.hash, index: 0 }]);
+    const tx3 = sendTx(privKey3, [pubKey1], [48], [{ hash: tx2.hash, index: 0 }]);
 
     const script2 = payToPubKeyHash(pubKey2);
     const prevHash = blockHash(genesisBlock.header);
